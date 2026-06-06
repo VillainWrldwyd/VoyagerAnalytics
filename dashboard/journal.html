@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voyager Journal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+</head>
+<body>
+
+    <div class="page-header">
+
+        <h1>Trading Journal</h1>
+
+    </div>
+FIXME: This is a duplicate of the sidebar in dashboard.html.
+<div class="journal-container">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fas fa-rocket">Voyager</i>
+            <p>ANALYTICS</p>
+
+        </div>
+
+        <nav>
+            <a href="dashboard.html">
+                <i class="fas fa-tachograph-digital">Dashboard</i>
+            </a>
+
+            <a href="accounts.html">
+                <i class="fas fa-briefcase">Accounts</i>
+            </a>
+
+            <a href="trades.html">
+                <i class="fas fa-chart-line">Trades</i>
+            </a>
+
+            <a href="analytics.html">
+                <i class="fas fa-eye">Analytics</i>
+            </a>
+
+            <a href="journal.html" class="active">
+                <i class="fas fa-book-open-reader">Journal</i>
+            </a>
+
+            <a href="settings.html">
+               <i class="fas fa-gears">Settings</i>
+            </a>
+        </nav>
+    </aside>
+
+    <div class="journal-form">
+        <h2>New Journal Entry</h2>
+
+        <form id="journalForm">
+
+            <select
+                id="tradeId"
+                required
+            >
+
+                <option value="">
+                    Select Trade
+                </option>
+
+            </select>
+
+            <select id="emotion">
+
+                <option value="">
+                    Select Emotion
+                </option>
+
+                <option value="Confident">
+                    Confident
+                </option>
+
+                <option value="Calm">
+                    Calm
+                </option>
+
+                <option value="Fearful">
+                    Fearful
+                </option>
+
+                <option value="Greedy">
+                    Greedy
+                </option>
+
+                <option value="Frustrated">
+                    Frustrated
+                </option>
+
+            </select>
+
+            <textarea
+                id="lesson"
+                placeholder="Lesson learned"
+            ></textarea>
+
+            <textarea
+                id="mistake"
+                placeholder="Mistakes made"
+            ></textarea>
+
+            <input
+                type="number"
+                id="rating"
+                min="1"
+                max="10"
+                placeholder="Trade Rating (1-10)"
+            >
+
+            <button type="submit">
+                Save Journal
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+<hr>
+
+<div id="journalList">
+
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/journal.js"></script>
+
+</body>
+</html>
