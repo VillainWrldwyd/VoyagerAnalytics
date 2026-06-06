@@ -1,6 +1,5 @@
 import os
 import uuid
-import MetaTrader5 as mt5
 from uuid import uuid4
 from datetime import datetime, timedelta
 
@@ -740,6 +739,12 @@ def get_mt5_history():
 
     ## mt5 open positions(render trade history)
 @app.post("/mt5/sync")
+def _mt5_unavailable():
+    return {
+        "status": "error",
+        "message": "MT5 is not available/ installed"
+    }
+
 def sync_mt5_trades(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db)
