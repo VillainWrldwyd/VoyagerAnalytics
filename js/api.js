@@ -1,5 +1,5 @@
 // switch from local to live host
-const API_URL = "http://localhost:8000";
+const API_URL = "https://voyager-analytics-1.onrender.com";
 
 // API functions
 // Register a new user
