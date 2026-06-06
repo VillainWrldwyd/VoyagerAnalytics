@@ -6,4 +6,3 @@ python-jose
 python-multipart
 email-validator
 python-dotenv
-MetaTrader5; sys_platform == "win32"
