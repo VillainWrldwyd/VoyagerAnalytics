@@ -855,6 +855,67 @@ def sync_mt5_trades(
         "imported": imported
     }
 
+# ─────────────────────────────────────────
+#  TRADE IMPORT (from local MT5 sync script)
+# ─────────────────────────────────────────
+
+from typing import List
+from pydantic import BaseModel
+
+class TradeImport(BaseModel):
+    ticket: str
+    symbol: str
+    order_type: str
+    lot_size: float
+    open_price: float
+    close_price: float
+    profit: float
+    time: int
+
+@app.post("/trades/import")
+def import_trades(
+    trades: List[TradeImport],
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user_accounts = db.query(Account).filter(
+        Account.user_id == current_user["user_id"]
+    ).all()
+
+    if not user_accounts:
+        raise HTTPException(status_code=404, detail="No account linked")
+
+    account_id = user_accounts[0].id
+    imported = 0
+
+    for t in trades:
+        existing = db.query(Trade).filter(
+            Trade.ticket == t.ticket
+        ).first()
+
+        if existing:
+            continue
+
+        trade = Trade(
+            id=str(uuid.uuid4()),
+            account_id=account_id,
+            symbol=t.symbol,
+            order_type=t.order_type,
+            lot_size=t.lot_size,
+            open_price=t.open_price,
+            close_price=t.close_price,
+            profit=t.profit,
+            ticket=t.ticket,
+            created_at=datetime.fromtimestamp(t.time)
+        )
+
+        db.add(trade)
+        imported += 1
+
+    db.commit()
+
+    return {"status": "success", "imported": imported}
+
 ## Calendar Heatmap
 @app.get("/analytics/heatmap")
 def get_heatmap(
