@@ -205,24 +205,14 @@ document
 
         console.log(token);
 
-        const result =
-        await syncMT5(token);
+       const result = await syncMT5(token);
 
-        if(result.imported === 0){
-
-            alert(
-                "No new trades found."
-            );
-
+    if(result.status === "error"){
+        alert("MT5 sync must be run locally.\nUse sync.py on your Windows machine.");
+        }else if(result.imported === 0){
+            alert("No new trades found.");
         }else{
-
-            alert(
-                `Imported ${
-                    result.imported
-                } new trades`
-            );
-
+            alert(`Imported ${result.imported} new trades`);
         }
-
     }
 );
