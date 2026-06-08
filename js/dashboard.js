@@ -20,16 +20,19 @@ async function loadDashboard(){
 
     // MT5 is only available locally — fail gracefully on live server
     let mt5 = { balance: 0, equity: 0, profit: 0, margin_free: 0 };
-
     try {
-        const mt5Data = await getMT5Account(token);
-        if(mt5Data && !mt5Data.status){
-            mt5 = mt5Data;
+        const res = await fetch(`${API_URL}/mt5/account`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if(res.ok){
+            const mt5Data = await res.json();
+            if(mt5Data && !mt5Data.status){
+                mt5 = mt5Data;
+            }
         }
     } catch(e) {
-        console.log("MT5 not available on server");
+        console.log("MT5 unavailable:", e.message);
     }
-
     document.getElementById("mt5Balance").textContent    = `$${Number(mt5.balance).toFixed(2)}`;
     document.getElementById("mt5Equity").textContent     = `$${Number(mt5.equity).toFixed(2)}`;
     document.getElementById("mt5Profit").textContent     = `$${Number(mt5.profit).toFixed(2)}`;
