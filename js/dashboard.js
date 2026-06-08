@@ -14,91 +14,53 @@ if(!token){
 // load dashboard data
 async function loadDashboard(){
 
-    const mt5 =
-    await getMT5Account(
-        token
-    );
+    const analytics = await getAnalytics(token);
+    const accounts  = await getAccounts(token);
+    const trades    = await getTrades(token);
 
-    const analytics =
-    await getAnalytics(
-        token
-    );
+    // MT5 is only available locally — fail gracefully on live server
+    let mt5 = { balance: 0, equity: 0, profit: 0, margin_free: 0 };
 
-    const accounts =
-    await getAccounts(
-        token
-    );
+    try {
+        const mt5Data = await getMT5Account(token);
+        if(mt5Data && !mt5Data.status){
+            mt5 = mt5Data;
+        }
+    } catch(e) {
+        console.log("MT5 not available on server");
+    }
 
-    const trades =
-    await getTrades(
-        token
-    );
+    document.getElementById("mt5Balance").textContent    = `$${Number(mt5.balance).toFixed(2)}`;
+    document.getElementById("mt5Equity").textContent     = `$${Number(mt5.equity).toFixed(2)}`;
+    document.getElementById("mt5Profit").textContent     = `$${Number(mt5.profit).toFixed(2)}`;
+    document.getElementById("mt5FreeMargin").textContent = `$${Number(mt5.margin_free).toFixed(2)}`;
 
-    console.log("MT5 Account:", mt5);
-    console.log(document.getElementById("mt5Balance"));
-    console.log(document.getElementById("mt5Equity"));
-    console.log(document.getElementById("mt5Profit"));
-    console.log(document.getElementById("mt5FreeMargin"));
-
+    document.getElementById("dashboardProfit").textContent   = `$${analytics.total_profit}`;
+    document.getElementById("dashboardWinRate").textContent  = `${analytics.win_rate}%`;
+    document.getElementById("dashboardAccounts").textContent = accounts.length;
+    document.getElementById("dashboardTrades").textContent   = analytics.trade_count;
 
     buildEquityCurve(trades);
 
-    document.getElementById(
-        "mt5Balance"
-    ).textContent =
-        `$${Number(mt5.balance).toFixed(2)}`;
-
-    document.getElementById(
-        "mt5Equity"
-    ).textContent =
-        `$${Number(mt5.equity).toFixed(2)}`;
-
-    document.getElementById(
-        "mt5Profit"
-    ).textContent =
-        `$${Number(mt5.profit).toFixed(2)}`;
-
-    document.getElementById(
-        "mt5FreeMargin"
-    ).textContent =
-        `$${Number(mt5.margin_free).toFixed(2)}`;
-
-    const table =
-    document.getElementById(
-        "recentTradesTable"
-    );
-
+    const table = document.getElementById("recentTradesTable");
     table.innerHTML = "";
 
-    trades
-        .slice(-5)
-        .reverse()
-        .forEach(trade => {
+    trades.slice(-5).reverse().forEach(trade => {
 
-            const row =
-            document.createElement("tr");
+        const row = document.createElement("tr");
 
-            const profitClass =
-                trade.profit >= 0
-                ? "profit-positive"
-                : "profit-negative";
+        const profitClass = trade.profit >= 0 ? "profit-positive" : "profit-negative";
 
-            row.innerHTML = `
+        row.innerHTML = `
+            <td>${trade.symbol}</td>
+            <td>${trade.order_type}</td>
+            <td class="${profitClass}">
+                ${trade.profit >= 0 ? "+" : ""}$${trade.profit}
+            </td>
+        `;
 
-                <td>${trade.symbol}</td>
-
-                <td>${trade.order_type}</td>
-
-                <td class="${profitClass}">
-                    ${trade.profit >= 0 ? "+" : ""}
-                    $${trade.profit}
-                </td>
-
-            `;
-
-            table.appendChild(row);
-
-        })
+        table.appendChild(row);
+    });
 
 
     // mt5 sync
