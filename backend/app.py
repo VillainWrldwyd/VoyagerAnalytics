@@ -650,27 +650,29 @@ def _mt5_unavailable():
 @app.get("/mt5/account")
 def get_mt5_account():
     if not MT5_AVAILABLE:
-        return{
-            _mt5_unavailable()
+        return _mt5_unavailable()
+    try:
+        if not mt5.initialize():
+            return {"status": "error", "message": "MT5 not connected"}
+        account = mt5.account_info()
+        if account is None:
+            mt5.shutdown()
+            return {"status": "error", "message": "No account logged in"}
+        data = {
+            "login": account.login,
+            "server": account.server,
+            "balance": account.balance,
+            "equity": account.equity,
+            "profit": account.profit,
+            "margin": account.margin,
+            "margin_free": account.margin_free,
+            "currency": account.currency
         }
-
-    if not mt5.initialize():
-        return {
-            "status": "error",
-            "message": "MT5 not connected"
-        }
-
-    account = mt5.account_info()
-
-    if account is None:
-
         mt5.shutdown()
-
-        return {
-            "status": "error",
-            "message": "No account logged in"
-        }
-
+        return data
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    
     data = {
         "login": account.login,
         "server": account.server,
