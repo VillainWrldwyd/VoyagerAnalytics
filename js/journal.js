@@ -1,186 +1,108 @@
-const token =
-localStorage.getItem(
-    "token"
-);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal | Voyager Analytics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/pgAnime.css">
+</head>
+<body>
 
-async function loadJournals(){
+<div id="loader">
+    <div class="spinner"></div>
+</div>
 
-    const journals =
-    await getJournals(token);
+<div class="dashboard-container">
 
-    const trades =
-    await getTrades(token);
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-rocket">Voyager</i>
+            <p>ANALYTICS</p>
+        </div>
 
-    const container =
-    document.getElementById(
-        "journalList"
-    );
+        <nav>
+            <a href="dashboard.html">
+                <i class="fas fa-tachograph-digital">Dashboard</i>
+            </a>
+            <a href="accounts.html">
+                <i class="fas fa-briefcase">Accounts</i>
+            </a>
+            <a href="trades.html">
+                <i class="fas fa-chart-line">Trades</i>
+            </a>
+            <a href="analytics.html">
+                <i class="fas fa-eye">Analytics</i>
+            </a>
+            <a href="journal.html" class="active">
+                <i class="fas fa-book-open-reader">Journal</i>
+            </a>
+            <a href="settings.html">
+                <i class="fas fa-gears">Settings</i>
+            </a>
+        </nav>
+    </aside>
 
-    container.innerHTML = "";
+    <main class="main-content">
 
-    journals.forEach(entry=>{
+        <header class="page-header">
+            <h2>Trading Journal</h2>
+        </header>
 
-        console.log("Journal Trade ID:", entry.trade_id);
+        <div class="journal-form">
+            <h3>New Entry</h3>
 
-        console.log(
-            "Available Trade IDs:",
-            trades.map(t => t.id)
-        );
+            <form id="journalForm">
 
-        const trade =
-        trades.find(
-            t => t.id === entry.trade_id
-        );
+                <select id="tradeId" required>
+                    <option value="">Select Trade</option>
+                </select>
 
-        const tradeText =
-        trade
-        ?
-        `${entry.trade_id}: ${trade.symbol}
-         (${trade.order_type})
-         Profit:
-         ${trade.profit}`
-        :
-        "Trade Not Found";
+                <select id="emotion">
+                    <option value="">Select Emotion</option>
+                    <option value="Confident">Confident</option>
+                    <option value="Calm">Calm</option>
+                    <option value="Fearful">Fearful</option>
+                    <option value="Greedy">Greedy</option>
+                    <option value="Frustrated">Frustrated</option>
+                </select>
 
-        const card =
-        document.createElement(
-            "div"
-        );
+                <textarea
+                    id="lesson"
+                    placeholder="What did you learn from this trade?"
+                ></textarea>
 
-        card.className =
-        "metric-card";
+                <textarea
+                    id="mistake"
+                    placeholder="Any mistakes made?"
+                ></textarea>
 
-        card.innerHTML = `
+                <input
+                    type="number"
+                    id="rating"
+                    min="1"
+                    max="10"
+                    placeholder="Trade Rating (1-10)"
+                >
 
-            <h3>
-                ${entry.emotion}
-            </h3>
+                <button type="submit">
+                    Save Entry
+                </button>
 
-            <p>
-                <strong>Trade:</strong>
-                ${tradeText}
-            </p>
+            </form>
+        </div>
 
-            <p>
-                <strong>Lesson:</strong>
-                ${entry.lesson}
-            </p>
+        <h3 style="margin: 30px 0 15px">Past Entries</h3>
 
-            <p>
-                <strong>Mistake:</strong>
-                ${entry.mistake}
-            </p>
+        <div id="journalList"></div>
 
-            <p>
-                Rating:
-                ${entry.rating}/10
-            </p>
+    </main>
+</div>
 
-        `;
-
-        container.appendChild(
-            card
-        );
-
-    });
-
-}
-
-document
-.getElementById(
-    "journalForm"
-)
-.addEventListener(
-    "submit",
-    async(e)=>{
-
-        e.preventDefault();
-
-        await createJournal(
-            token,
-            {
-
-                trade_id:
-                document.getElementById(
-                    "tradeId"
-                ).value,
-
-                emotion:
-                document.getElementById(
-                    "emotion"
-                ).value,
-
-                lesson:
-                document.getElementById(
-                    "lesson"
-                ).value,
-
-                mistake:
-                document.getElementById(
-                    "mistake"
-                ).value,
-
-                rating:
-                document.getElementById(
-                    "rating"
-                ).value
-
-            }
-        );
-
-        loadJournals();
-
-        document
-        .getElementById(
-            "journalForm"
-        )
-        .reset();
-
-    }
-);
-
-
-
-async function loadTradeOptions(){
-
-    const trades =
-    await getTrades(token);
-
-    const select =
-    document.getElementById(
-        "tradeId"
-    );
-
-    trades.forEach(trade=>{
-
-        const option =
-        document.createElement(
-            "option"
-        );
-
-        option.value =
-        trade.id;
-
-        option.textContent =
-
-            `${trade.symbol}
-             (${trade.order_type})
-             Profit:
-             ${trade.profit}`;
-
-        select.appendChild(
-            option
-        );
-
-    });
-
-}
-
-window.onload =
-async()=>{
-
-    await loadTradeOptions();
-
-    await loadJournals();
-
-};
+<script src="../js/api.js"></script>
+<script src="../js/journal.js"></script>
+<script src="../js/pgAnime.js"></script>
+</body>
+</html>
