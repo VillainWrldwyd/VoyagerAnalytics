@@ -3,60 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">   
-<link rel="stylesheet" href="../css/global.css">
-<link rel="stylesheet" href="../css/dashboard.css">
+    <title>Settings | Voyager Analytics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/pgAnime.css">
 </head>
 <body>
-    
-    <aside class="sidebar">
 
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<div class="dashboard-container">
+
+    <aside class="sidebar">
         <div class="logo">
             <i class="fas fa-rocket">Voyager</i>
             <p>ANALYTICS</p>
-
         </div>
 
         <nav>
             <a href="dashboard.html">
                 <i class="fas fa-tachograph-digital">Dashboard</i>
             </a>
-
             <a href="accounts.html">
                 <i class="fas fa-briefcase">Accounts</i>
             </a>
-
             <a href="trades.html">
                 <i class="fas fa-chart-line">Trades</i>
             </a>
-
             <a href="analytics.html">
                 <i class="fas fa-eye">Analytics</i>
             </a>
-
             <a href="journal.html">
                 <i class="fas fa-book-open-reader">Journal</i>
             </a>
-
-            <a href="settings.html"  class="active">
-               <i class="fas fa-gears">Settings</i>
+            <a href="settings.html" class="active">
+                <i class="fas fa-gears">Settings</i>
             </a>
         </nav>
-
     </aside>
 
+    <main class="main-content">
 
+        <header class="page-header">
+            <h2>Settings</h2>
+        </header>
 
+        <!-- Profile -->
+        <div class="metric-card" style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 16px; font-size: 16px; opacity: 1;">Profile</h3>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="
+                    width: 60px; height: 60px;
+                    border-radius: 50%;
+                    background: var(--primary);
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 24px; font-weight: 700;
+                " id="avatarInitial">?</div>
+                <div>
+                    <p id="profileEmail" style="font-size: 16px; font-weight: 600;">—</p>
+                    <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Voyager Account</p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Change Password -->
+        <div class="metric-card" style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 16px; font-size: 16px; opacity: 1;">Change Password</h3>
+            <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: 12px; max-width: 400px;">
+                <input
+                    type="password"
+                    id="newPassword"
+                    placeholder="New password"
+                    style="padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: white;"
+                >
+                <input
+                    type="password"
+                    id="confirmNewPassword"
+                    placeholder="Confirm new password"
+                    style="padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: white;"
+                >
+                <button type="submit" class="btn-primary" style="width: fit-content; padding: 12px 24px; border: none; cursor: pointer; border-radius: 10px;">
+                    Update Password
+                </button>
+            </form>
+            <p id="passwordMsg" style="margin-top: 10px; font-size: 13px;"></p>
+        </div>
 
+        <!-- MT5 Sync Info -->
+        <div class="metric-card" style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 12px; font-size: 16px; opacity: 1;">MT5 Sync</h3>
+            <p style="color: var(--muted); font-size: 14px; line-height: 1.6;">
+                MT5 trade sync runs locally on your Windows machine.<br>
+                Open your <strong style="color: white;">backend/</strong> folder in terminal and run:
+            </p>
+            <div style="
+                background: #0d1117;
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 14px 18px;
+                margin-top: 12px;
+                font-family: monospace;
+                font-size: 14px;
+                color: #00d4ff;
+            ">py sync.py</div>
+        </div>
 
+        <!-- Data Management -->
+        <div class="metric-card" style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 12px; font-size: 16px; opacity: 1;">Data</h3>
+            <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">
+                Permanently delete all your trades and journal entries. This cannot be undone.
+            </p>
+            <button id="clearDataBtn" class="delete-btn">
+                <i class="fas fa-trash" style="margin-right: 6px;"></i>
+                Clear All Trade Data
+            </button>
+            <p id="clearMsg" style="margin-top: 10px; font-size: 13px;"></p>
+        </div>
 
+        <!-- About -->
+        <div class="metric-card">
+            <h3 style="margin-bottom: 12px; font-size: 16px; opacity: 1;">About</h3>
+            <p style="color: var(--muted); font-size: 14px; line-height: 1.8;">
+                Voyager Analytics — Trading Performance Tracker<br>
+                Version 1.0.0<br>
+                Backend: <span style="color: var(--success);">Live on Render</span>
+            </p>
+        </div>
 
+    </main>
+</div>
 
-
-
-
+<script src="../js/api.js"></script>
+<script src="../js/settings.js"></script>
+<script src="../js/pgAnime.js"></script>
 </body>
 </html>
