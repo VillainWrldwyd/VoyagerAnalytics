@@ -92,62 +92,52 @@
             <p id="passwordMsg" style="margin-top: 10px; font-size: 13px;"></p>
         </div>
 
+
         <!-- MT5 Sync -->
         <div class="metric-card" style="margin-bottom: 20px;">
             <h3 style="margin-bottom: 6px; font-size: 16px; opacity: 1;">Sync Trades</h3>
             <p style="color: var(--muted); font-size: 13px; margin-bottom: 20px;">
-                Imports your full MT5 trade history into Voyager.
+                Import your full MT5 trade history into Voyager in two steps.
             </p>
 
-            <!-- Agent status indicator -->
+            <!-- Agent Status -->
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                <div id="agentDot" style="
-                    width: 10px; height: 10px;
-                    border-radius: 50%;
-                    background: var(--danger);
-                "></div>
-                <p id="agentStatus" style="font-size: 13px; color: var(--muted);">
-                    Sync Agent not running
-                </p>
+                <div id="agentDot" style="width:10px; height:10px; border-radius:50%; background: var(--danger);"></div>
+                <p id="agentStatus" style="font-size: 13px; color: var(--muted);">Sync Agent not running</p>
             </div>
 
             <!-- Step 1 -->
-            <div style="
-                background: var(--card);
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                padding: 16px;
-                margin-bottom: 12px;
-            ">
-                <p style="font-weight: 600; margin-bottom: 6px;">
-                    Step 1 — Start the Sync Agent
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                <p style="font-weight: 600; margin-bottom: 8px;">Step 1 — Download & run the Sync Agent</p>
+                <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px;">
+                    Click the button below to download the Sync Agent. Once downloaded,
+                    double-click the file to run it. A small window will open —
+                    keep it running in the background. You only need to do this once.
                 </p>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">
-                    Find the <strong style="color:white;">Voyager</strong> folder on your computer
-                    and double-click <strong style="color: #00d4ff;">start_agent.bat</strong>.
-                    A small window will open — keep it running in the background.
-                    You only need to do this once per session or after closing new trades.
-                </p>
+                <button id="downloadAgentBtn" style="
+                    background: var(--card);
+                    border: 1px solid var(--border);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 14px;
+                ">
+                    <i class="fas fa-download" style="margin-right: 8px;"></i>
+                    Download Sync Agent
+                </button>
             </div>
 
             <!-- Step 2 -->
-            <div style="
-                background: var(--card);
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                padding: 16px;
-                margin-bottom: 20px;
-            ">
-                <p style="font-weight: 600; margin-bottom: 6px;">
-                    Step 2 — Make sure MT5 is open
-                </p>
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <p style="font-weight: 600; margin-bottom: 6px;">Step 2 — Open MetaTrader 5</p>
                 <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">
-                    Open <strong style="color: white;">MetaTrader 5</strong> on your computer
-                    and make sure you are logged into your trading account.
+                    Make sure <strong style="color: white;">MetaTrader 5</strong> is open
+                    and logged into your trading account before syncing.
                 </p>
             </div>
 
-            <!-- Sync button -->
+            <!-- Sync Button -->
             <button id="syncNowBtn" class="btn-primary" style="
                 padding: 14px 28px;
                 border: none;
