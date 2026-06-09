@@ -92,23 +92,76 @@
             <p id="passwordMsg" style="margin-top: 10px; font-size: 13px;"></p>
         </div>
 
-        <!-- MT5 Sync Info -->
+        <!-- MT5 Sync -->
         <div class="metric-card" style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 12px; font-size: 16px; opacity: 1;">MT5 Sync</h3>
-            <p style="color: var(--muted); font-size: 14px; line-height: 1.6;">
-                MT5 trade sync runs locally on your Windows machine.<br>
-                Open your <strong style="color: white;">backend/</strong> folder in terminal and run:
+            <h3 style="margin-bottom: 6px; font-size: 16px; opacity: 1;">Sync Trades</h3>
+            <p style="color: var(--muted); font-size: 13px; margin-bottom: 20px;">
+                Imports your full MT5 trade history into Voyager.
             </p>
+
+            <!-- Agent status indicator -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div id="agentDot" style="
+                    width: 10px; height: 10px;
+                    border-radius: 50%;
+                    background: var(--danger);
+                "></div>
+                <p id="agentStatus" style="font-size: 13px; color: var(--muted);">
+                    Sync Agent not running
+                </p>
+            </div>
+
+            <!-- Step 1 -->
             <div style="
-                background: #0d1117;
+                background: var(--card);
                 border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+            ">
+                <p style="font-weight: 600; margin-bottom: 6px;">
+                    Step 1 — Start the Sync Agent
+                </p>
+                <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">
+                    Find the <strong style="color:white;">Voyager</strong> folder on your computer
+                    and double-click <strong style="color: #00d4ff;">start_agent.bat</strong>.
+                    A small window will open — keep it running in the background.
+                    You only need to do this once per session or after closing new trades.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div style="
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 20px;
+            ">
+                <p style="font-weight: 600; margin-bottom: 6px;">
+                    Step 2 — Make sure MT5 is open
+                </p>
+                <p style="font-size: 13px; color: var(--muted); line-height: 1.7;">
+                    Open <strong style="color: white;">MetaTrader 5</strong> on your computer
+                    and make sure you are logged into your trading account.
+                </p>
+            </div>
+
+            <!-- Sync button -->
+            <button id="syncNowBtn" class="btn-primary" style="
+                padding: 14px 28px;
+                border: none;
                 border-radius: 10px;
-                padding: 14px 18px;
-                margin-top: 12px;
-                font-family: monospace;
-                font-size: 14px;
-                color: #00d4ff;
-            ">py sync.py</div>
+                cursor: pointer;
+                font-size: 15px;
+                font-weight: 600;
+                width: 100%;
+            ">
+                <i class="fas fa-rotate" style="margin-right: 8px;"></i>
+                Sync Now
+            </button>
+
+            <p id="syncMsg" style="margin-top: 12px; font-size: 13px; text-align: center;"></p>
         </div>
 
         <!-- Data Management -->
