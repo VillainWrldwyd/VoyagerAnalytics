@@ -93,3 +93,64 @@ document.getElementById("clearDataBtn")
     });
 
 loadProfile();
+
+
+// Check if sync agent is running
+async function checkAgentStatus(){
+    const running = await checkAgent();
+    const dot    = document.getElementById("agentDot");
+    const status = document.getElementById("agentStatus");
+
+    if(running){
+        dot.style.background    = "var(--success)";
+        status.textContent      = "Sync Agent is running — ready to sync";
+        status.style.color      = "var(--success)";
+    } else {
+        dot.style.background    = "var(--danger)";
+        status.textContent      = "Sync Agent not running — follow Step 1 below";
+        status.style.color      = "var(--muted)";
+    }
+}
+
+// Sync Now button
+document.getElementById("syncNowBtn")
+    .addEventListener("click", async () => {
+        const msg = document.getElementById("syncMsg");
+        const btn = document.getElementById("syncNowBtn");
+
+        const running = await checkAgent();
+
+        if(!running){
+            msg.style.color = "var(--danger)";
+            msg.textContent = "Sync Agent is not running. Please follow Step 1 first.";
+            return;
+        }
+
+        btn.textContent  = "Syncing...";
+        btn.disabled     = true;
+        msg.textContent  = "";
+
+        try {
+            const result = await syncFromAgent(token);
+
+            if(result.status === "error"){
+                msg.style.color = "var(--danger)";
+                msg.textContent = result.message;
+            } else {
+                msg.style.color = "var(--success)";
+                msg.textContent = result.imported > 0
+                    ? `${result.imported} new trades imported successfully!`
+                    : "Everything is up to date — no new trades found.";
+            }
+        } catch(e) {
+            msg.style.color = "var(--danger)";
+            msg.textContent = "Could not connect to Sync Agent. Make sure it is running.";
+        }
+
+        btn.innerHTML = '<i class="fas fa-rotate" style="margin-right: 8px;"></i>Sync Now';
+        btn.disabled  = false;
+    });
+
+// Check agent status on page load and every 5 seconds
+checkAgentStatus();
+setInterval(checkAgentStatus, 5000);
