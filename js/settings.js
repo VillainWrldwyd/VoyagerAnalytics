@@ -4,6 +4,7 @@ if(!token){
     window.location.href = "../login.html";
 }
 
+// Show email + avatar initial from token
 function loadProfile(){
     try {
         const payload = JSON.parse(atob(token.split(".")[1]));
@@ -15,6 +16,7 @@ function loadProfile(){
     }
 }
 
+// Change password
 document.getElementById("changePasswordForm")
     .addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -61,12 +63,12 @@ document.getElementById("changePasswordForm")
         }
     });
 
+// Clear all data
 document.getElementById("clearDataBtn")
     .addEventListener("click", async () => {
         const confirmed = confirm(
             "This will permanently delete ALL your trades and journal entries. Are you sure?"
         );
-
         if(!confirmed) return;
 
         const msg = document.getElementById("clearMsg");
@@ -76,7 +78,6 @@ document.getElementById("clearDataBtn")
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${token}` }
             });
-
             const data = await res.json();
 
             if(res.ok){
@@ -92,23 +93,53 @@ document.getElementById("clearDataBtn")
         }
     });
 
-loadProfile();
+// Download Sync Agent .bat file
+document.getElementById("downloadAgentBtn")
+    .addEventListener("click", () => {
 
+        const batContent = `@echo off
+    echo ========================================
+    echo   Voyager Sync Agent Setup
+    echo ========================================
+    echo.
+    echo Downloading Sync Agent...
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/VillainWrldwyd/voyager-analytics/main/backend/sync_agent.py' -OutFile '%TEMP%\\voyager_sync_agent.py'"
+    echo.
+    echo Installing requirements...
+    pip install fastapi uvicorn MetaTrader5 requests -q
+    echo.
+    echo ========================================
+    echo   Sync Agent is running!
+    echo   Keep this window open in the background
+    echo   then click Sync Now on the Voyager website(in the settings).
+    echo ========================================
+    echo.
+    py "%TEMP%\\voyager_sync_agent.py"
+    pause`;
+
+        const blob = new Blob([batContent], { type: "application/octet-stream" });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        a.href     = url;
+        a.download = "Voyager_Sync_Agent.bat";
+        a.click();
+        URL.revokeObjectURL(url);
+    });
 
 // Check if sync agent is running
 async function checkAgentStatus(){
     const running = await checkAgent();
-    const dot    = document.getElementById("agentDot");
-    const status = document.getElementById("agentStatus");
+    const dot     = document.getElementById("agentDot");
+    const status  = document.getElementById("agentStatus");
 
     if(running){
-        dot.style.background    = "var(--success)";
-        status.textContent      = "Sync Agent is running — ready to sync";
-        status.style.color      = "var(--success)";
+        dot.style.background = "var(--success)";
+        status.style.color   = "var(--success)";
+        status.textContent   = "Sync Agent is running — ready to sync";
     } else {
-        dot.style.background    = "var(--danger)";
-        status.textContent      = "Sync Agent not running — follow Step 1 below";
-        status.style.color      = "var(--muted)";
+        dot.style.background = "var(--danger)";
+        status.style.color   = "var(--muted)";
+        status.textContent   = "Sync Agent not running — complete Step 1 first";
     }
 }
 
@@ -122,13 +153,13 @@ document.getElementById("syncNowBtn")
 
         if(!running){
             msg.style.color = "var(--danger)";
-            msg.textContent = "Sync Agent is not running. Please follow Step 1 first.";
+            msg.textContent = "Sync Agent is not running. Please complete Step 1 first.";
             return;
         }
 
-        btn.textContent  = "Syncing...";
-        btn.disabled     = true;
-        msg.textContent  = "";
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Syncing...';
+        btn.disabled  = true;
+        msg.textContent = "";
 
         try {
             const result = await syncFromAgent(token);
@@ -140,17 +171,19 @@ document.getElementById("syncNowBtn")
                 msg.style.color = "var(--success)";
                 msg.textContent = result.imported > 0
                     ? `${result.imported} new trades imported successfully!`
-                    : "Everything is up to date — no new trades found.";
+                    : "All up to date — no new trades found.";
             }
         } catch(e) {
             msg.style.color = "var(--danger)";
-            msg.textContent = "Could not connect to Sync Agent. Make sure it is running.";
+            msg.textContent = "Could not reach Sync Agent. Make sure it is still running.";
         }
 
-        btn.innerHTML = '<i class="fas fa-rotate" style="margin-right: 8px;"></i>Sync Now';
+        btn.innerHTML = '<i class="fas fa-rotate" style="margin-right:8px;"></i>Sync Now';
         btn.disabled  = false;
     });
 
-// Check agent status on page load and every 5 seconds
+// Check agent every 1min seconds
 checkAgentStatus();
-setInterval(checkAgentStatus, 5000);
+setInterval(checkAgentStatus, 60000);
+
+loadProfile();
