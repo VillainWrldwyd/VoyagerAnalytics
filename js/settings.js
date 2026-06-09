@@ -98,32 +98,32 @@ document.getElementById("downloadAgentBtn")
     .addEventListener("click", () => {
 
         const batContent = `@echo off
-    echo ========================================
-    echo   Voyager Sync Agent Setup
-    echo ========================================
-    echo.
-    echo Downloading Sync Agent...
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/VillainWrldwyd/VoyagerAnalytics/refs/heads/main/backend/sync_agent.py' -OutFile '%TEMP%\\voyager_sync_agent.py'"
-    echo.
-    echo Installing requirements...
-    pip install fastapi uvicorn MetaTrader5 requests -q
-    echo.
-    echo ========================================
-    echo   Sync Agent is running!
-    echo   Keep this window open in the background
-    echo   then click Sync Now on the Voyager website(in the settings).
-    echo ========================================
-    echo.
-    py "%TEMP%\\voyager_sync_agent.py"
-    pause`;
-
-        const blob = new Blob([batContent], { type: "application/octet-stream" });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement("a");
-        a.href     = url;
-        a.download = "Voyager_Sync_Agent.bat";
-        a.click();
-        URL.revokeObjectURL(url);
+        echo ========================================
+        echo   Voyager Sync Agent Setup
+        echo ========================================
+        echo.
+        echo Downloading Sync Agent...
+        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/VillainWrldwyd/VoyagerAnalytics/refs/heads/main/backend/sync_agent.py' -OutFile '%TEMP%\\voyager_sync_agent.py'"
+        echo.
+        echo Installing requirements...
+        pip install fastapi uvicorn MetaTrader5 requests -q
+        echo.
+        echo ========================================
+        echo   Sync Agent is running!
+        echo   Keep this window open in the background
+        echo   then click Sync Now on the Voyager website(in the settings).
+        echo ========================================
+        echo.
+        py "%TEMP%\\voyager_sync_agent.py"
+        pause`;
+    
+            const blob = new Blob([batContent], { type: "application/octet-stream" });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement("a");
+            a.href     = url;
+            a.download = "Voyager_Sync_Agent.bat";
+            a.click();
+            URL.revokeObjectURL(url);
     });
 
 // Check if sync agent is running
