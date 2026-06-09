@@ -103,7 +103,7 @@ document.getElementById("downloadAgentBtn")
     echo ========================================
     echo.
     echo Downloading Sync Agent...
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/VillainWrldwyd/voyager-analytics/main/backend/sync_agent.py' -OutFile '%TEMP%\\voyager_sync_agent.py'"
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/VillainWrldwyd/VoyagerAnalytics/refs/heads/main/backend/sync_agent.py' -OutFile '%TEMP%\\voyager_sync_agent.py'"
     echo.
     echo Installing requirements...
     pip install fastapi uvicorn MetaTrader5 requests -q
