@@ -375,3 +375,22 @@ async function getMonthlyPerformance(token){
     return await response.json();
 }
 
+
+// Local sync agent
+async function syncFromAgent(token) {
+    const response = await fetch("http://127.0.0.1:5001/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+    });
+    return response.json();
+}
+
+async function checkAgent() {
+    try {
+        const response = await fetch("http://127.0.0.1:5001/status");
+        return response.ok;
+    } catch(e) {
+        return false;
+    }
+}
