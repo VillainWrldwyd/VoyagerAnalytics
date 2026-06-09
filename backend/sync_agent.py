@@ -72,8 +72,14 @@ def sync(payload: dict):
         headers={"Authorization": f"Bearer {token}"}
     )
 
-    return res.json()
-
+    try:
+        return res.json()
+    except ValueError:
+        return {
+            "status": "error",
+            "message": f"Backend returned non-JSON (status {res.status_code})",
+            "raw": res.text
+        }
 
 if __name__ == "__main__":
     print("Voyager Sync Agent running...")
