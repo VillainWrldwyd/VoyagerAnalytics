@@ -3,6 +3,7 @@ import MetaTrader5 as mt5
 from datetime import datetime, timedelta
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import uvicorn
 
 app = FastAPI()
