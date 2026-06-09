@@ -1128,3 +1128,112 @@ def get_monthly_performance(
     for month, data
     in monthly_data.items()
 ]
+
+
+# ─────────────────────────────────────────
+#  TRADE IMPORT (from local MT5 sync script)
+# ─────────────────────────────────────────
+from typing import List
+from pydantic import BaseModel
+
+class TradeImport(BaseModel):
+    ticket: str
+    symbol: str
+    order_type: str
+    lot_size: float
+    open_price: float
+    close_price: float
+    profit: float
+    time: int
+
+@app.post("/trades/import")
+def import_trades(
+    trades: List[TradeImport],
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user_accounts = db.query(Account).filter(
+        Account.user_id == current_user["user_id"]
+    ).all()
+
+    if not user_accounts:
+        raise HTTPException(status_code=404, detail="No account linked")
+
+    account_id = user_accounts[0].id
+    imported = 0
+
+    for t in trades:
+        existing = db.query(Trade).filter(
+            Trade.ticket == t.ticket
+        ).first()
+
+        if existing:
+            continue
+
+        trade = Trade(
+            id=str(uuid.uuid4()),
+            account_id=account_id,
+            symbol=t.symbol,
+            order_type=t.order_type,
+            lot_size=t.lot_size,
+            open_price=t.open_price,
+            close_price=t.close_price,
+            profit=t.profit,
+            ticket=t.ticket,
+            created_at=datetime.fromtimestamp(t.time)
+        )
+
+        db.add(trade)
+        imported += 1
+
+    db.commit()
+
+    return {"status": "success", "imported": imported}
+
+#------
+# change password and delete update
+#------
+# Change password
+@app.post("/auth/change-password")
+def change_password(
+    payload: dict,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(
+        User.id == current_user["user_id"]
+    ).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.password_hash = hash_password(payload["new_password"])
+    db.commit()
+
+    return {"message": "Password updated"}
+
+
+# Clear all trade data
+@app.delete("/data/clear")
+def clear_data(
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    account_ids = [
+        a.id for a in
+        db.query(Account).filter(
+            Account.user_id == current_user["user_id"]
+        ).all()
+    ]
+
+    db.query(Trade).filter(
+        Trade.account_id.in_(account_ids)
+    ).delete(synchronize_session=False)
+
+    db.query(Journal).filter(
+        Journal.user_id == current_user["user_id"]
+    ).delete(synchronize_session=False)
+
+    db.commit()
+
+    return {"message": "All data cleared"}
