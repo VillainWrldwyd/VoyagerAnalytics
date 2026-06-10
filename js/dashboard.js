@@ -1,42 +1,21 @@
-/*route protection*/
-const token =
-localStorage.getItem(
-    "token"
-);
+const token = localStorage.getItem("token");
 
 if(!token){
-
-    window.location.href =
-    "../login.html";
-
+    window.location.href = "../login.html";
 }
 
-// load dashboard data
+// Show user email in topbar
+try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    document.getElementById("userEmail").textContent = payload.email || "";
+} catch(e) {}
+
+
 async function loadDashboard(){
 
     const analytics = await getAnalytics(token);
     const accounts  = await getAccounts(token);
     const trades    = await getTrades(token);
-
-    // MT5 is only available locally — fail gracefully on live server
-    let mt5 = { balance: 0, equity: 0, profit: 0, margin_free: 0 };
-    try {
-        const res = await fetch(`${API_URL}/mt5/account`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        if(res.ok){
-            const mt5Data = await res.json();
-            if(mt5Data && !mt5Data.status){
-                mt5 = mt5Data;
-            }
-        }
-    } catch(e) {
-        console.log("MT5 unavailable:", e.message);
-    }
-    document.getElementById("mt5Balance").textContent    = `$${Number(mt5.balance).toFixed(2)}`;
-    document.getElementById("mt5Equity").textContent     = `$${Number(mt5.equity).toFixed(2)}`;
-    document.getElementById("mt5Profit").textContent     = `$${Number(mt5.profit).toFixed(2)}`;
-    document.getElementById("mt5FreeMargin").textContent = `$${Number(mt5.margin_free).toFixed(2)}`;
 
     document.getElementById("dashboardProfit").textContent   = `$${analytics.total_profit}`;
     document.getElementById("dashboardWinRate").textContent  = `${analytics.win_rate}%`;
@@ -52,7 +31,9 @@ async function loadDashboard(){
 
         const row = document.createElement("tr");
 
-        const profitClass = trade.profit >= 0 ? "profit-positive" : "profit-negative";
+        const profitClass = trade.profit >= 0
+            ? "profit-positive"
+            : "profit-negative";
 
         row.innerHTML = `
             <td>${trade.symbol}</td>
@@ -64,101 +45,68 @@ async function loadDashboard(){
 
         table.appendChild(row);
     });
-
-
-    // mt5 sync
-    document
-    .getElementById(
-        "mt5Balance"
-    )
-    .textContent =
-    `$${mt5.balance}`;
-
-    document
-    .getElementById(
-        "mt5Equity"
-    )
-    .textContent =
-    `$${mt5.equity}`;
-
-    document
-    .getElementById(
-        "mt5Profit"
-    )
-    .textContent =
-    `$${mt5.profit}`;
-
 }
 
 
-// build Equity curve
 function buildEquityCurve(trades){
+
     let equity = 0;
-
     const labels = [];
+    const data   = [];
 
-    const data = [];
-
-    trades.forEach((trade,index)=>{
+    trades.forEach((trade, index) => {
         equity += trade.profit;
-        labels.push(
-            `Trade ${index + 1}`
-        );
+        labels.push(`Trade ${index + 1}`);
+        data.push(equity);
+    });
 
-        data.push(
-            equity
-        );
+    const ctx = document.getElementById("equityChart");
 
-     });
-
-    // equity curve chart
-    const ctx = document.getElementById(
-        "equityChart"
-    );
-
-    if(window.equityChart && 
+    if(window.equityChart &&
         typeof window.equityChart.destroy === "function"){
         window.equityChart.destroy();
     }
 
-    window.equityChart = new Chart(ctx,{
-
-        type:"line",
-
-       data:{
-
+    window.equityChart = new Chart(ctx, {
+        type: "line",
+        data: {
             labels,
-            datasets:[{
-
-            label:"Equity",
-
-            data
-
+            datasets: [{
+                label: "Equity",
+                data,
+                borderColor: "#00d4ff",
+                backgroundColor: "rgba(0, 212, 255, 0.05)",
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.4
             }]
-
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "#94a3b8", maxTicksLimit: 8 },
+                    grid:  { color: "rgba(255,255,255,0.05)" }
+                },
+                y: {
+                    ticks: { color: "#94a3b8" },
+                    grid:  { color: "rgba(255,255,255,0.05)" }
+                }
+            }
         }
-
     });
 }
+
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "../login.html";
+});
+
+
 window.onload = loadDashboard;
-
-/*logout functionality*/
-const logoutBtn =
-document.getElementById("logoutBtn");
-
-if(logoutBtn){
-
-    logoutBtn.addEventListener(
-        "click",
-        ()=>{
-
-            localStorage.removeItem(
-                "token"
-            );
-
-            window.location.href =
-            "../login.html";
-        }
-    );
-
-}
