@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-API_URL = "https://voyager-analytics-1.onrender.com"
+API_URL = "https://voyager-analytics1.onrender.com"
 
 
 @app.get("/status")
