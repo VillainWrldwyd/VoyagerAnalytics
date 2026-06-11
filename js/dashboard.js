@@ -26,25 +26,36 @@ async function loadDashboard(){
 
     const table = document.getElementById("recentTradesTable");
     table.innerHTML = "";
-
-    trades.slice(-5).reverse().forEach(trade => {
-
-        const row = document.createElement("tr");
-
-        const profitClass = trade.profit >= 0
-            ? "profit-positive"
-            : "profit-negative";
-
-        row.innerHTML = `
-            <td>${trade.symbol}</td>
-            <td>${trade.order_type}</td>
-            <td class="${profitClass}">
-                ${trade.profit >= 0 ? "+" : ""}$${trade.profit}
-            </td>
+    
+    if(trades.length === 0){
+        table.innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align: center; color: var(--muted); padding: 40px 20px;">
+                    <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 12px; display: block; opacity: 0.3;"></i>
+                    <p>No trades yet — sync your MT5 account in Settings.</p>
+                </td>
+            </tr>
         `;
-
-        table.appendChild(row);
-    });
+    } else {
+        trades.slice(-5).reverse().forEach(trade => {
+    
+            const row = document.createElement("tr");
+    
+            const profitClass = trade.profit >= 0
+                ? "profit-positive"
+                : "profit-negative";
+    
+            row.innerHTML = `
+                <td>${trade.symbol}</td>
+                <td>${trade.order_type}</td>
+                <td class="${profitClass}">
+                    ${trade.profit >= 0 ? "+" : ""}$${trade.profit}
+                </td>
+            `;
+    
+            table.appendChild(row);
+        });
+    }
 }
 
 
