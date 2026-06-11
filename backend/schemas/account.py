@@ -1,12 +1,9 @@
 from pydantic import BaseModel
-
+from typing import Optional
 
 class AccountCreate(BaseModel):
-
+    account_name: str
     broker: str
-
-    account_number: str
-
-    server: str
-
-    investor_password: str
+    server: Optional[str] = ""
+    account_number: Optional[str] = ""
+    investor_password: Optional[str] = ""
