@@ -1,43 +1,32 @@
-const connectBtn =
-document.getElementById(
-    "connectAccountBtn"
-);
+const token = localStorage.getItem("token");
 
-const modal =
-document.getElementById(
-    "accountModal"
-);
-
-connectBtn.addEventListener(
-    "click",
-    () => {
-
-        modal.style.display =
-        "flex";
-
-    }
-);
-
-// date formatting function
-function formatDate(dateString){
-
-    const date =
-    new Date(dateString);
-
-    return date.toLocaleDateString(
-        "en-GB",
-        {
-            day:"2-digit",
-            month:"short",
-            year:"numeric"
-        }
-    );
-
+if(!token){
+    window.location.href = "../login.html";
 }
 
-// live mock data
-const token =
-localStorage.getItem("token");
+const connectBtn = document.getElementById("connectAccountBtn");
+const modal      = document.getElementById("accountModal");
+
+// Open modal
+connectBtn.addEventListener("click", () => {
+    modal.style.display = "flex";
+});
+
+// Close modal when clicking outside
+modal.addEventListener("click", (e) => {
+    if(e.target === modal){
+        modal.style.display = "none";
+    }
+});
+
+function formatDate(dateString){
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
 
 async function loadAccounts(){
 
@@ -46,7 +35,7 @@ async function loadAccounts(){
 
     table.innerHTML = "";
 
-    if(accounts.length === 0){
+    if(!Array.isArray(accounts) || accounts.length === 0){
         table.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; color: var(--muted); padding: 60px 20px;">
@@ -87,89 +76,39 @@ async function loadAccounts(){
     });
 }
 
-// Handle account form submission
-const accountForm =
-document.getElementById(
-    "accountForm"
-);
-
-accountForm.addEventListener(
-    "submit",
-    async (e) => {
-
+// Handle form submission
+document.getElementById("accountForm")
+    .addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const token =
-        localStorage.getItem(
-            "token"
-        );
-
-        const broker =
-        document.getElementById(
-            "broker"
-        ).value;
-
-        const account_number =
-        document.getElementById(
-            "accountNumber"
-        ).value;
-
-        const server =
-        document.getElementById(
-            "server"
-        ).value;
-
-        const investor_password =
-        document.getElementById(
-            "investorPassword"
-        ).value;
-
-        const result =
-        await createAccount({
-
-            broker,
-            account_number,
-            server,
-            investor_password
-
+        const result = await createAccount({
+            broker:            document.getElementById("broker").value,
+            account_number:    document.getElementById("accountNumber").value,
+            server:            document.getElementById("server").value,
+            investor_password: document.getElementById("investorPassword").value
         }, token);
 
-        console.log(result);
+        if(result.message === "Account created"){
+            modal.style.display = "none";
+            document.getElementById("accountForm").reset();
+            await loadAccounts();
+        } else {
+            alert(result.detail || "Failed to create account. Try again.");
+        }
+    });
 
-        alert(
-            "Account submitted"
-        );
+// MT5 sync button
+document.getElementById("syncMt5Btn")
+    .addEventListener("click", async () => {
+        const result = await syncMT5(token);
 
-        await loadAccounts();
-
-    }
-);
-
-// mt5 account sync btn
-document
-.getElementById(
-    "syncMt5Btn"
-)
-.addEventListener(
-    "click",
-    async()=>{
-
-        
-        const token =
-        localStorage.getItem(
-            "token"
-        );
-
-        console.log(token);
-
-       const result = await syncMT5(token);
-
-    if(result.status === "error"){
-        alert("MT5 sync must be run locally.\nUse sync.py on your Windows machine.");
-        }else if(result.imported === 0){
+        if(result.status === "error"){
+            alert("MT5 sync must be run locally.\nUse the Sync Agent in Settings.");
+        } else if(result.imported === 0){
             alert("No new trades found.");
-        }else{
+        } else {
             alert(`Imported ${result.imported} new trades`);
         }
-    }
-);
+    });
+
+loadAccounts();
