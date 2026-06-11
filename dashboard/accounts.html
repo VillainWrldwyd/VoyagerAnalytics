@@ -55,14 +55,8 @@
     </aside>
 
     <main class="main-content">
-
         <div class="page-header">
-
             <h2>Trading Accounts</h2>
-
-            <button id="syncMt5Btn">
-                Sync MT5
-            </button>
 
             <button id="connectAccountBtn"
                     class="btn-primary">
@@ -77,11 +71,11 @@
 
                 <thead>
                     <tr>
+                        <th>Account Name</th>
                         <th>Broker</th>
-                        <th>Account</th>
-                        <th>Server</th>
                         <th>Status</th>
-                        <th>Last Sync</th>
+                        <th>Created</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
@@ -97,51 +91,30 @@
 
 </div>
 
+<!--Account Form-->
 <div id="accountModal" class="modal">
-
     <div class="modal-content">
-
-        <h2>Connect MT5 Account</h2>
-
+        <h2>Connect Account</h2>
         <form id="accountForm">
-
+            <input
+                type="text"
+                id="accountName"
+                placeholder="Account Name (e.g. ICMarkets Live)"
+                required
+            >
             <input
                 type="text"
                 id="broker"
-                placeholder="Broker"
+                placeholder="Broker (e.g. ICMarkets)"
                 required
             >
-
-            <input
-                type="text"
-                id="accountNumber"
-                placeholder="Account Number"
-                required
-            >
-
-            <input
-                type="text"
-                id="server"
-                placeholder="Server"
-                required
-            >
-
-            <input
-                type="password"
-                id="investorPassword"
-                placeholder="Investor Password"
-                required
-            >
-
             <button type="submit">
                 Connect Account
             </button>
-
         </form>
-
     </div>
-
 </div>
+
 <script src="../js/api.js"></script>
 <script src="../js/accounts.js"></script>
 <script src="../js/pgAnime.js"></script>
