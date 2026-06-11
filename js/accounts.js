@@ -41,94 +41,51 @@ localStorage.getItem("token");
 
 async function loadAccounts(){
 
-    const accounts =
-    await getAccounts(token);
-
-    console.log(accounts);
-
-    const table =
-    document.getElementById(
-        "accountsTable"
-    );
-
-    console.log(table);
+    const accounts = await getAccounts(token);
+    const table    = document.getElementById("accountsTable");
 
     table.innerHTML = "";
 
+    if(accounts.length === 0){
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--muted); padding: 60px 20px;">
+                    <i class="fas fa-briefcase" style="font-size: 2rem; margin-bottom: 16px; display: block; opacity: 0.3;"></i>
+                    <p style="margin-bottom: 8px;">No accounts connected yet.</p>
+                    <p style="font-size: 13px;">Click <strong style="color: white;">+ Connect Account</strong> to get started.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
     accounts.forEach(account => {
 
-        const row =
-        document.createElement("tr");
+        const row = document.createElement("tr");
 
         row.innerHTML = `
             <td>${account.broker}</td>
-
             <td>${account.account_number}</td>
-
             <td>${account.server}</td>
-
             <td>
-                <span class="status-badge">
-                    ${account.status}
-                </span>
+                <span class="status-badge">${account.status}</span>
             </td>
-
             <td>${formatDate(account.created_at)}</td>
-
             <td>
-                <button
-                    class="delete-btn"
-                    data-id="${account.id}"
-                >
-                    Delete
-                </button>
+                <button class="delete-btn" data-id="${account.id}">Delete</button>
             </td>
         `;
 
         table.appendChild(row);
 
-const deleteBtn =
-row.querySelector(
-    ".delete-btn"
-);
-
-deleteBtn.addEventListener(
-    "click",
-    async () => {
-
-        const confirmDelete =
-        confirm(
-            "Delete this account?"
-        );
-
-        if(!confirmDelete){
-            return;
-        }
-
-        const token =
-        localStorage.getItem(
-            "token"
-        );
-
-        const result =
-        await deleteAccount(
-            account.id,
-            token
-        );
-
-        console.log(result);
-
-        await loadAccounts();
-
-    }
-);
-
+        row.querySelector(".delete-btn")
+            .addEventListener("click", async () => {
+                if(!confirm("Delete this account?")) return;
+                await deleteAccount(account.id, token);
+                await loadAccounts();
+            });
     });
-
 }
-
-loadAccounts();
-
 
 // Handle account form submission
 const accountForm =
