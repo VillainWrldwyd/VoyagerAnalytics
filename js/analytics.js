@@ -260,69 +260,39 @@ async function loadHeatmap(){
 
 
            //daily summary(click calendar day)
-        cell.addEventListener(
-            "click",
-            async () => {
+        cell.addEventListener("click", async () => {
 
-                const token =
-                localStorage.getItem(
-                    "token"
-                );
-
-                const trades =
-                await getDayTrades(
-                    token,
-                    currentDateString
-                );
-
-                document
-                .getElementById(
-                    "modalDate"
-                )
-                .textContent =
-                currentDateString;
-
-                document
-                .getElementById(
-                    "modalTrades"
-                )
-                .innerHTML =
-
-                trades.map(
-                    t =>
-
-                    `<p>
-                        ${t.symbol}
-                        :
-                        $${t.profit}
-                    </p>`
-
-                ).join("");
-
-                document
-                .getElementById(
-                    "dayModal"
-                )
-                .style.display =
-                "block";
-
-                document
-                .getElementById(
-                    "closeModal"
-                )
-                .onclick = () => {
-
-                    document
-                    .getElementById(
-                        "dayModal"
-                    )
-                    .style.display =
-                    "none";
-
-                };
-
+            const trades = await getDayTrades(token, currentDateString);
+        
+            document.getElementById("modalDate").textContent = currentDateString;
+        
+            const modalTrades = document.getElementById("modalTrades");
+        
+            if(trades.length === 0){
+                modalTrades.innerHTML = `
+                    <div class="day-modal-empty">
+                        <i class="fas fa-calendar-xmark" style="font-size: 1.5rem; margin-bottom: 10px; display: block; opacity: 0.3;"></i>
+                        No trades on this day.
+                    </div>
+                `;
+            } else {
+                modalTrades.innerHTML = trades.map(t => `
+                    <div class="day-modal-trade">
+                        <span style="font-weight: 600;">${t.symbol}</span>
+                        <span style="color: ${t.profit >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 600;">
+                            ${t.profit >= 0 ? '+' : ''}$${t.profit}
+                        </span>
+                    </div>
+                `).join("");
             }
-        );
+        
+            document.getElementById("dayModal").classList.add("open");
+        
+            document.getElementById("closeModal").onclick = () => {
+                document.getElementById("dayModal").classList.remove("open");
+            };
+        
+        });
     }
 
 // Set month title(e.g. "September 2024")
