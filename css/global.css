@@ -135,3 +135,144 @@ body{
     border-radius:10px;
     text-decoration:none;
 }
+
+/* ── Hamburger button (hidden on desktop) ── */
+.hamburger {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* ── Sidebar overlay (mobile) ── */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ── Mobile breakpoint ── */
+@media (max-width: 768px) {
+
+    .hamburger {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Sidebar slides off-screen by default */
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        height: 100vh;
+        z-index: 999;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    /* Main content fills full width */
+    .main-content {
+        width: 100%;
+        padding: 20px 16px;
+    }
+
+    /* Topbar */
+    .topbar {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* All grids stack to single column */
+    .dashboard-grid,
+    .kpi-grid,
+    .bottom-grid,
+    .features-grid,
+    .steps-grid {
+        grid-template-columns: 1fr !important;
+        flex-direction: column;
+    }
+
+    /* Tables scroll horizontally */
+    .table-card {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 500px;
+    }
+
+    /* Filters stack */
+    .filters {
+        flex-direction: column;
+    }
+
+    .filters input,
+    .filters select {
+        width: 100%;
+    }
+
+    /* Page header stacks */
+    .page-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    /* Stats bar on landing stacks */
+    .stats-bar {
+        flex-direction: column;
+        gap: 20px;
+        padding: 24px;
+    }
+
+    .stat-divider {
+        width: 40px;
+        height: 1px;
+    }
+
+    /* Hero adjustments */
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Navbar */
+    .nav-links {
+        display: none;
+    }
+
+    /* Journal form full width */
+    .journal-form form {
+        max-width: 100%;
+    }
+
+    /* Settings form full width */
+    #changePasswordForm {
+        max-width: 100% !important;
+    }
+
+    /* Drawer full width */
+    .drawer {
+        width: 100%;
+        right: -100%;
+    }
+}
