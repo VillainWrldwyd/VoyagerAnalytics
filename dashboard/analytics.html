@@ -159,15 +159,15 @@
                 <div id="heatmap" class="skeleton"></div>            
                 </div>
 
-            <!--monthly review (click date)-->
-            <div id="dayModal" class="modal">
-                <div class="modal-content" class="skeleton">
-                    <span id="closeModal">
-                        <i class="fas fa-x"></i>
-                    </span>
-
-                    <h3 id="modalDate"></h3>
-
+            <!--Daily view (click date)-->
+            <div id="dayModal" class="day-modal-overlay">
+                <div class="day-modal-content">
+                    <div class="day-modal-header">
+                        <h3 id="modalDate"></h3>
+                        <button id="closeModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                     <div id="modalTrades"></div>
                 </div>
             </div>
