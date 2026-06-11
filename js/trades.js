@@ -1,153 +1,111 @@
-const token =
-localStorage.getItem(
-    "token"
-);
+const token = localStorage.getItem("token");
 
 if(!token){
-
-    window.location.href =
-    "../login.html";
-
+    window.location.href = "../login.html";
 }
 
-// Date formatting function
+let allTrades = [];
+
 function formatDate(dateString){
-
-    const date =
-    new Date(dateString);
-
-    return date.toLocaleDateString(
-        "en-GB",
-        {
-            day:"2-digit",
-            month:"short",
-            year:"numeric"
-        }
-    );
-
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
 }
 
-// Load trades and populate table
-async function loadTrades(){
-
-    const trades =
-    await getTrades(
-        token
-    );
-
-    const table =
-    document.getElementById(
-        "tradesTable"
-    );
-
+function renderTrades(trades){
+    const table = document.getElementById("tradesTable");
     table.innerHTML = "";
 
-    trades.forEach(trade => {
+    if(trades.length === 0){
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--muted); padding: 40px;">
+                    No trades found.
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
-        const row =
-        document.createElement(
-            "tr"
-        );
+    trades.forEach(trade => {
+        const row = document.createElement("tr");
+
+        const profitClass = trade.profit >= 0 ? "profit" : "loss";
 
         row.innerHTML = `
-
+            <td>${trade.symbol}</td>
+            <td>${trade.order_type}</td>
+            <td>${trade.lot_size}</td>
+            <td class="${profitClass}">$${trade.profit}</td>
+            <td>${formatDate(trade.created_at)}</td>
             <td>
-                ${trade.symbol}
-            </td>
-
-            <td>
-                ${trade.order_type}
-            </td>
-
-            <td>
-                ${trade.lot_size}
-            </td>
-
-            <td>
-                $${trade.profit}
-            </td>
-
-            <td>
-                ${formatDate(
-                    trade.created_at
-                )}
-            </td>
-
-            <td>
-
-                <button
-                    class="delete-btn"
-                    data-id="${trade.id}"
-                >
+                <button class="delete-btn" data-id="${trade.id}">
                     Delete
                 </button>
-
             </td>
-
         `;
 
-        table.appendChild(
-            row
-        );
+        table.appendChild(row);
 
-        const deleteBtn =
-        row.querySelector(
-            ".delete-btn"
-        );
+        row.querySelector(".delete-btn")
+            .addEventListener("click", async () => {
+                if(!confirm("Delete this trade?")) return;
+                await deleteTrade(trade.id, token);
+                allTrades = allTrades.filter(t => t.id !== trade.id);
+                applyFilters();
+            });
+    });
+}
 
-        deleteBtn.addEventListener(
+function applyFilters(){
+    const search    = document.getElementById("searchTrade").value.toLowerCase();
+    const direction = document.getElementById("directionFilter").value;
+    const result    = document.getElementById("resultFilter").value;
 
-            "click",
+    const filtered = allTrades.filter(trade => {
 
-            async () => {
+        const matchSymbol    = trade.symbol.toLowerCase().includes(search);
+        const matchDirection = direction === "" || trade.order_type === direction;
+        const matchResult    = result === ""
+            || (result === "profit" && trade.profit >= 0)
+            || (result === "loss"   && trade.profit < 0);
 
-                const confirmed =
-                confirm(
-                    "Delete trade?"
-                );
-
-                if(!confirmed){
-                    return;
-                }
-
-                await deleteTrade(
-                    trade.id,
-                    token
-                );
-
-                await loadTrades();
-
-            }
-
-        );
-
+        return matchSymbol && matchDirection && matchResult;
     });
 
+    renderTrades(filtered);
 }
-loadTrades();
 
-// Export trades to CSV
+async function loadTrades(){
+    allTrades = await getTrades(token);
+    renderTrades(allTrades);
+}
+
+// Filter listeners
+document.getElementById("searchTrade")
+    .addEventListener("input", applyFilters);
+
+document.getElementById("directionFilter")
+    .addEventListener("change", applyFilters);
+
+document.getElementById("resultFilter")
+    .addEventListener("change", applyFilters);
+
+// Export to CSV
 document.getElementById("exportBtn")
     .addEventListener("click", async () => {
 
-        const trades = await getTrades(token);
-
-        if(!trades || trades.length === 0){
+        if(!allTrades || allTrades.length === 0){
             alert("No trades to export.");
             return;
         }
 
-        const headers = [
-            "Symbol",
-            "Type",
-            "Lot Size",
-            "Open Price",
-            "Close Price",
-            "Profit",
-            "Date"
-        ];
+        const headers = ["Symbol","Type","Lot Size","Open Price","Close Price","Profit","Date"];
 
-        const rows = trades.map(trade => [
+        const rows = allTrades.map(trade => [
             trade.symbol,
             trade.order_type,
             trade.lot_size,
@@ -172,3 +130,5 @@ document.getElementById("exportBtn")
 
         URL.revokeObjectURL(url);
     });
+
+loadTrades();
