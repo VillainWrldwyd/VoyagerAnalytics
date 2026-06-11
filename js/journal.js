@@ -5,85 +5,114 @@ localStorage.getItem(
 
 async function loadJournals(){
 
-    const journals =
-    await getJournals(token);
+    const journals = await getJournals(token);
+    const trades   = await getTrades(token);
 
-    const trades =
-    await getTrades(token);
-
-    const container =
-    document.getElementById(
-        "journalList"
-    );
-
+    const container = document.getElementById("journalList");
     container.innerHTML = "";
 
-    journals.forEach(entry=>{
+    if(journals.length === 0){
+        container.innerHTML = `
+            <div style="text-align: center; color: var(--muted); padding: 60px 20px;">
+                <i class="fas fa-book-open" style="font-size: 2rem; margin-bottom: 16px; display: block; opacity: 0.3;"></i>
+                <p>No journal entries yet. Log your first trade above.</p>
+            </div>
+        `;
+        return;
+    }
 
-        console.log("Journal Trade ID:", entry.trade_id);
+    journals.forEach(entry => {
 
-        console.log(
-            "Available Trade IDs:",
-            trades.map(t => t.id)
-        );
+        const trade = trades.find(t => t.id === entry.trade_id);
 
-        const trade =
-        trades.find(
-            t => t.id === entry.trade_id
-        );
+        const profitColor = trade
+            ? trade.profit >= 0
+                ? "var(--success)"
+                : "var(--danger)"
+            : "var(--muted)";
 
-        const tradeText =
-        trade
-        ?
-        `${entry.trade_id}: ${trade.symbol}
-         (${trade.order_type})
-         Profit:
-         ${trade.profit}`
-        :
-        "Trade Not Found";
+        const tradeLabel = trade
+            ? `${trade.symbol} · ${trade.order_type} · $${trade.profit}`
+            : "Trade not found";
 
-        const card =
-        document.createElement(
-            "div"
-        );
+        const emotionColors = {
+            "Confident":   { bg: "rgba(34,197,94,0.1)",   color: "#22c55e" },
+            "Calm":        { bg: "rgba(59,130,246,0.1)",   color: "#3b82f6" },
+            "Fearful":     { bg: "rgba(239,68,68,0.1)",    color: "#ef4444" },
+            "Greedy":      { bg: "rgba(234,179,8,0.1)",    color: "#eab308" },
+            "Frustrated":  { bg: "rgba(249,115,22,0.1)",   color: "#f97316" }
+        };
 
-        card.className =
-        "metric-card";
+        const emotionStyle = emotionColors[entry.emotion] || {
+            bg: "rgba(148,163,184,0.1)",
+            color: "var(--muted)"
+        };
+
+        const ratingColor = entry.rating >= 7
+            ? "var(--success)"
+            : entry.rating >= 4
+                ? "#eab308"
+                : "var(--danger)";
+
+        const card = document.createElement("div");
+        card.className = "metric-card";
+        card.style.marginBottom = "16px";
 
         card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
 
-            <h3>
-                ${entry.emotion}
-            </h3>
+                <span style="
+                    background: ${emotionStyle.bg};
+                    color: ${emotionStyle.color};
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 600;
+                ">${entry.emotion}</span>
 
-            <p>
-                <strong>Trade:</strong>
-                ${tradeText}
-            </p>
+                <span style="
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: ${ratingColor};
+                ">
+                    ${entry.rating}/10
+                </span>
 
-            <p>
-                <strong>Lesson:</strong>
-                ${entry.lesson}
-            </p>
+            </div>
 
-            <p>
-                <strong>Mistake:</strong>
-                ${entry.mistake}
-            </p>
+            <div style="
+                background: var(--sidebar);
+                border-radius: 10px;
+                padding: 12px 16px;
+                margin-bottom: 14px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            ">
+                <span style="font-size: 13px; color: var(--muted);">
+                    <i class="fas fa-chart-line" style="margin-right: 6px;"></i>
+                    ${tradeLabel}
+                </span>
+                <span style="font-weight: 700; color: ${profitColor}; font-size: 13px;">
+                    ${trade ? (trade.profit >= 0 ? "WIN" : "LOSS") : ""}
+                </span>
+            </div>
 
-            <p>
-                Rating:
-                ${entry.rating}/10
-            </p>
+            ${entry.lesson ? `
+            <div style="margin-bottom: 10px;">
+                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Lesson</p>
+                <p style="font-size: 14px; line-height: 1.6;">${entry.lesson}</p>
+            </div>` : ""}
 
+            ${entry.mistake ? `
+            <div>
+                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Mistake</p>
+                <p style="font-size: 14px; line-height: 1.6;">${entry.mistake}</p>
+            </div>` : ""}
         `;
 
-        container.appendChild(
-            card
-        );
-
+        container.appendChild(card);
     });
-
 }
 
 document
