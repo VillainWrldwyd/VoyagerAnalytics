@@ -1,6 +1,5 @@
 import os
 import uuid
-import MetaTrader5 as mt5
 from uuid import uuid4
 from datetime import datetime, timedelta
 
