@@ -36,6 +36,15 @@ except ImportError:
     MT5_AVAILABLE = False
 
 Base.metadata.create_all(bind=engine)
+# Auto-migration: add is_premium column if it doesn't exist
+from sqlalchemy import text
+
+with engine.connect() as conn:
+    try:
+        conn.execute(text("ALTER TABLE users ADD COLUMN is_premium BOOLEAN DEFAULT FALSE"))
+        conn.commit()
+    except Exception:
+        pass  # Column already exists, safe to ignore
 
 app = FastAPI()
 
